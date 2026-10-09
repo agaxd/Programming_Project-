@@ -1,0 +1,80 @@
+n = 3 #default value
+
+def makegrid(n, grid):
+    size = n * n
+    hline = ("----"+"+-----"*(n-1)) 
+    for i in range(0,size, n):
+        print(" | ".join(grid[i:i+n]))
+        if i < size-n:
+            print(hline)
+            
+def checkwinner(n, moves):
+    cells = set(m - 1 for m in moves)
+    lines = [range(r * n, r * n + n) for r in range(n)]      # rows
+    lines += [range(c, n * n, n) for c in range(n)]          # columns
+    lines += [range(0, n * n, n + 1), range(n - 1, n * n - 1, n - 1)]  # diagonals
+    return any(set(line) <= cells for line in lines)
+
+gamemode = int(input("Enter 1 for simple game, Enter 2 for custom size game , 3 for infinite game: "))
+
+while gamemode != 1 and gamemode !=2 and gamemode !=3:
+    gamemode = int(input("Incorrect entry. Enter 1 for simple game or 2 for custom size game or 3 for infinite game."))
+
+if gamemode == 1:
+    n = 3
+    grid = ["   "]*(n*n)
+    makegrid(n, grid)
+else:
+    n = int(input("Enter the size of the grid you would like: "))
+    grid = ["   "]*(n*n)
+    makegrid(n, grid)
+    #tcurrent progress: the grid prints, but no values are saved as right now input is only working for 3x3 grid 
+
+player1 = []
+player2 = [] 
+size = n * n
+turns = 1
+
+while (len(player1) + len(player2)) < size:
+    grid = [" "] * size
+    for move in player1:
+        grid[move - 1] = "X"
+    for move in player2:
+        grid[move - 1] = "O"
+    
+    
+    turn = int(input("Pick a cell from 1-9, with 1 being the top left and 9 being bottom right : "))
+    while turn not in range(1,10) or turn in player1 or turn in player2:
+        if turn not in range(1,10):
+            turn = int(input("Incorrect entry, enter a number between 1 and 9"))
+        else:
+            turn = int(input("That space is taken, try again:"))
+    
+        
+    if turns %2 != 0:
+        player1.append(turn)
+        if gamemode ==3 and len(player1) >n:
+            player1.pop(0)
+    else:
+        player2.append(turn)
+        if gamemode ==3 and len(player2) >n:
+            player2.pop(0)
+        
+    turns +=1
+    
+    grid = ["   "] * size
+    for move in player1:
+        grid[move - 1] = " X "
+    for move in player2:
+        grid[move -1] = " O "
+    
+    makegrid(n, grid)
+
+    if checkwinner(n, player1):
+        print("Player 1 (X) wins!")
+        break
+    if checkwinner(n, player2):
+        print("Player 2 (O) wins!")
+        break
+else:
+    print("It's a draw!")
