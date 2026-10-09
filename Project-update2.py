@@ -1,0 +1,97 @@
+n = 3 #default value
+
+def makegrid(n, grid):
+    size = n * n
+    hline = ("----"+"+-----"*(n-1)) 
+    for i in range(0,size, n):
+        print(" | ".join(grid[i:i+n]))
+        if i < size-n:
+            print(hline)
+            
+def checkwinner(n, moves):
+    cells = set(m - 1 for m in moves)
+    lines = [range(r * n, r * n + n) for r in range(n)]      # rows
+    lines += [range(c, n * n, n) for c in range(n)]          # columns
+    lines += [range(0, n * n, n + 1), range(n - 1, n * n - 1, n - 1)]  # diagonals
+    return any(set(line) <= cells for line in lines)
+
+
+        
+def maingame(infinite):
+    player1 = []
+    player2 = [] 
+    size = n * n
+    turns = 1
+    infinite = infinite
+
+    while infinite or (len(player1) + len(player2)) < size:
+        grid = [" "] * size
+        for move in player1:
+            grid[move - 1] = "X"
+        for move in player2:
+            grid[move - 1] = "O"
+        
+        
+        turn = int(input(f"Pick a cell from 1-{size}, with 1 being the top left and {size} being bottom right : "))
+        
+        if turn not in range(0,size + 1):
+            turn = int(input(f"Incorrect entry, enter a number between 1 and {size}"))
+            
+        if turn in player1 or turn in player2:
+            turn = int(input("That space is taken, try again."))
+            
+        if turns %2 != 0:
+            player1.append(turn)
+        else:
+            player2.append(turn)
+            
+        if infinite and len(player1)>n:
+            player1.pop(0)
+        if infinite and len(player2)>n:
+            player2.pop(0)
+            
+        turns +=1
+        
+        grid = ["   "] * size
+        for move in player1:
+            grid[move - 1] = " X "
+        for move in player2:
+            grid[move -1] = " O "
+        
+        makegrid(n, grid)
+
+        if checkwinner(n, player1):
+            print("Player 1 (X) wins!")
+            break
+        if checkwinner(n, player2):
+            print("Player 2 (O) wins!")
+            break
+    else:
+        print("It's a draw!")
+        
+        
+
+def intro():
+    
+    global n 
+
+    gamemode = int(input("Enter 1 for simple game, Enter 2 for custom size game: "))
+
+    while gamemode != 1 and gamemode !=2:
+        gamemode = int(input("Incorrect entry. Enter 1 for simple game or 2 for custom size game."))
+        
+    infinite = int(input("Enter 1 for normal mode, enter 2 for infinite mode. "))== 2
+
+    if gamemode == 1:
+        n = 3
+        grid = ["   "]*(n*n)
+        makegrid(n, grid)
+        maingame(infinite)
+    else:
+        n = int(input("Enter the size of the grid you would like: "))
+        grid = ["   "]*(n*n)
+        makegrid(n, grid)
+        maingame(infinite)
+        
+intro()
+        
